@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.base
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -50,20 +51,22 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
         get() = navigationController?.let { it.currentStackIndex != defaultPosition } ?: false
 
     init {
-        val isDarkTheme = Config.get<Boolean>(Config.Key.DARK_THEME)
-        val theme = if (isDarkTheme) {
+        val theme = if (Config.darkTheme) {
             AppCompatDelegate.MODE_NIGHT_YES
         } else {
             AppCompatDelegate.MODE_NIGHT_NO
         }
         AppCompatDelegate.setDefaultNightMode(theme)
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
     }
 
     override fun applyOverrideConfiguration(config: Configuration?) {
         // Force applying our preferred local
         config?.setLocale(LocaleManager.locale)
         super.applyOverrideConfiguration(config)
+    }
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(LocaleManager.getLocaleContext(base, LocaleManager.locale))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
